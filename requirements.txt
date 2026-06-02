@@ -1,0 +1,7 @@
+streamlit
+yfinance
+requests
+python-dotenv
+finnhub-python
+plotly
+pypdf
