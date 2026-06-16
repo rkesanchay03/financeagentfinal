@@ -37,6 +37,7 @@ st.markdown("""
     --bg:          #0b0e12;
     --surface:     #131720;
     --surface2:    #1a2030;
+    --surface3:    #202a38;
     --border:      #232b38;
     --border2:     #2e3a4a;
     --text:        #e4e8ef;
@@ -49,6 +50,8 @@ st.markdown("""
     --teal-border: rgba(45,212,191,0.22);
     --green:       #34d399;
     --red:         #f87171;
+    --blue:        #3b82f6;
+    --purple:      #a855f7;
     --font-mono:   'DM Mono', 'Courier New', monospace;
 }
 
@@ -78,16 +81,40 @@ html, body, [data-testid="stApp"] {
     padding-right: 2rem !important;
     margin-left: auto !important;
     margin-right: auto !important;
+    width: 100% !important;
+}
+
+/* Responsive layout: adjust when sidebar is collapsed */
+@media (max-width: 1400px) {
+    .block-container {
+        max-width: 95vw !important;
+    }
 }
 
 /* ════════════════════════════════════
-   SIDEBAR  — fully normalised
+   SIDEBAR  — Modern & Organized
    ════════════════════════════════════ */
 [data-testid="stSidebar"] {
-    background: var(--surface) !important;
+    background: linear-gradient(180deg, var(--surface) 0%, var(--surface) 100%) !important;
     border-right: 1px solid var(--border) !important;
-    min-width: 230px !important;
-    max-width: 260px !important;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.4) !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-testid="stSidebar"][aria-expanded="true"] {
+    background: linear-gradient(180deg, var(--surface) 0%, var(--surface) 100%) !important;
+    border-right: 1px solid var(--border) !important;
+    min-width: 240px !important;
+    max-width: 280px !important;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.4) !important;
+}
+
+[data-testid="stSidebar"][aria-expanded="false"] {
+    min-width: 0px !important;
+    max-width: 0px !important;
+    border-right: none !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
 }
 
 /* Remove Streamlit's default top padding so content starts at the very top */
@@ -120,176 +147,225 @@ html, body, [data-testid="stApp"] {
 
 /* Sidebar heading (branding only) */
 [data-testid="stSidebar"] .sb-brand-name {
-    font-size: 15px !important;
+    font-size: 16px !important;
     font-weight: 700 !important;
     color: var(--text) !important;
     letter-spacing: -0.02em;
+    text-transform: uppercase;
 }
 [data-testid="stSidebar"] .sb-brand-sub {
     font-size: 10px !important;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-dim) !important;
+    font-weight: 500;
 }
 [data-testid="stSidebar"] .sb-section-label {
-    font-size: 10px !important;
+    font-size: 11px !important;
     font-weight: 700 !important;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
-    color: var(--teal-dim) !important;
-    display: block;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--border);
+    color: var(--teal) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-bottom: 10px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 1.5px solid var(--border);
+}
+[data-testid="stSidebar"] .sb-section-icon {
+    font-size: 14px !important;
+    opacity: 0.8 !important;
 }
 [data-testid="stSidebar"] .sb-tip {
     font-size: 11px !important;
     color: var(--text-dim) !important;
-    line-height: 1.7 !important;
+    line-height: 1.8 !important;
 }
 [data-testid="stSidebar"] .sb-tip code {
     font-size: 11px !important;
     font-family: var(--font-mono) !important;
     color: var(--teal) !important;
     background: var(--surface2);
-    padding: 0 4px;
-    border-radius: 3px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
 }
 
-/* Sidebar buttons — uniform size */
+/* Sidebar buttons — enhanced with icons and better hover */
 [data-testid="stSidebar"] .stButton > button {
     width: 100% !important;
     background: var(--surface2) !important;
     border: 1px solid var(--border) !important;
-    border-radius: 7px !important;
+    border-radius: 8px !important;
     color: var(--text-muted) !important;
-    font-size: 12.5px !important;
+    font-size: 13px !important;
     font-weight: 500 !important;
     font-family: 'Inter', sans-serif !important;
-    padding: 7px 11px !important;
+    padding: 10px 13px !important;
     text-align: left !important;
-    transition: all 0.15s ease !important;
-    margin-bottom: 3px !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    margin-bottom: 6px !important;
     letter-spacing: 0.01em;
-    line-height: 1 !important;
+    line-height: 1.4 !important;
+    cursor: pointer !important;
+    position: relative !important;
+    overflow: hidden !important;
 }
+
+[data-testid="stSidebar"] .stButton > button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--teal-glow);
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
 [data-testid="stSidebar"] .stButton > button:hover {
     background: var(--teal-glow) !important;
-    border-color: var(--teal-deep) !important;
+    border-color: var(--teal) !important;
     color: var(--teal) !important;
-    transform: translateX(2px);
+    transform: translateX(4px) !important;
+    box-shadow: 0 4px 12px rgba(45, 212, 191, 0.15) !important;
 }
 
 /* Sidebar dividers */
 [data-testid="stSidebar"] hr,
 [data-testid="stSidebar"] [data-testid="stDivider"] {
     border-color: var(--border) !important;
-    margin: 10px 0 !important;
+    margin: 14px 0 !important;
+    opacity: 0.7 !important;
 }
 
 /* ════════════════════════════════════
-   CHAT
+   CHAT — Enhanced with avatars & polish
    ════════════════════════════════════ */
 [data-testid="stChatMessageContainer"] {
     background: transparent !important;
+    gap: 12px !important;
 }
+
 [data-testid="stChatMessage"] {
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     padding: 16px 20px !important;
-    margin-bottom: 8px !important;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.35) !important;
-    transition: border-color 0.15s !important;
-}
-[data-testid="stChatMessage"]:hover {
-    border-color: var(--border2) !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
 }
 
-/* Chat input — rounded pill-shaped bar matching screenshot */
+[data-testid="stChatMessage"]:hover {
+    border-color: var(--border2) !important;
+    box-shadow: 0 4px 12px rgba(45, 212, 191, 0.08) !important;
+}
+
+/* Assistant messages get a teal accent */
+[data-testid="stChatMessage"][data-testid*="assistant"] {
+    border-left: 3px solid var(--teal) !important;
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191, 0.03) 100%) !important;
+}
+
+/* User messages get a subtle blue accent */
+[data-testid="stChatMessage"][data-testid*="user"] {
+    border-left: 3px solid var(--blue) !important;
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(59, 130, 246, 0.03) 100%) !important;
+    margin-left: 30px !important;
+}
+
+/* Chat input — rounded pill-shaped bar with enhanced styling */
 [data-testid="stChatInputContainer"] {
-    background: var(--surface) !important;
-    border: 1px solid var(--border2) !important;
-    border-radius: 26px !important;
-    padding-left: 16px !important; /* normal, clean padding since "+" is outside */
-    max-width: 730px !important; /* Locks width to match Streamlit centered layout */
+    background: var(--surface2) !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 28px !important;
+    padding-left: 18px !important;
+    padding-right: 16px !important;
+    max-width: 750px !important;
     margin: 0 auto !important;
-    transition: border-color 0.15s, box-shadow 0.15s !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
 }
+
 [data-testid="stChatInputContainer"]:focus-within {
-    border-color: var(--teal-dim) !important;
-    box-shadow: 0 0 0 2px var(--teal-glow) !important;
+    border-color: var(--teal) !important;
+    box-shadow: 0 0 0 3px var(--teal-glow), 0 4px 12px rgba(45, 212, 191, 0.2) !important;
+    background: var(--surface) !important;
 }
+
 [data-testid="stChatInputContainer"] textarea {
-    border-radius: 26px !important;
+    border-radius: 28px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 14px !important;
+}
+
+[data-testid="stChatInputContainer"] textarea::placeholder {
+    color: var(--text-dim) !important;
+    font-style: italic !important;
 }
 
 /* ─────────────────────────────────────────────────────────────
-   NATIVE "+" ATTACHMENT DESIGN & TRANSITIONS (PREMIUM OUTSIDE BUTTON)
+   ATTACHMENT BUTTON — Premium floating design
    ───────────────────────────────────────────────────────────── */
 div[data-testid="stFileUploader"] {
     position: fixed !important;
-    bottom: 50px !important; /* perfectly aligned vertically with the chat input container */
-    width: 32px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    background-color: var(--surface2) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 50% !important; /* circular button UI */
+    bottom: 50px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dim) 100%) !important;
+    border: 2px solid var(--teal) !important;
+    border-radius: 50% !important;
     z-index: 1000 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     overflow: hidden !important;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: 0 6px 20px rgba(45, 212, 191, 0.3) !important;
     
-    /* Default position (sidebar collapsed or absent): exactly 12px to the left of the centered 730px chat bar */
-    left: calc(50% - 365px + 100px) !important; /* 365px (half of 730px) + 32px (button width) + 12px (gap) = 44px offset */
+    left: calc(50% - 365px - 66px) !important;
 }
 
-/* Sidebar expanded: shift right by exactly 122px (half of 244px sidebar width) */
-[data-testid="stSidebar"][data-collapsed="false"] ~ .main div[data-testid="stFileUploader"],
-[data-testid="stSidebar"]:not([data-collapsed="true"]) ~ .main div[data-testid="stFileUploader"] {
-    left: calc(50% - 365px - 44px + 122px) !important;
-}
-
-/* Sidebar collapsed: position at collapsed coordinate */
-[data-testid="stSidebar"][data-collapsed="true"] ~ .main div[data-testid="stFileUploader"] {
-    left: calc(50% - 365px - 44px) !important;
+/* Sidebar expanded: shift right so the button clears the sidebar */
+[data-testid="stSidebar"][aria-expanded="true"] ~ .main div[data-testid="stFileUploader"] {
+    left: calc(50% - 365px - 66px + 130px) !important;
 }
 
 @media (max-width: 767px) {
     div[data-testid="stFileUploader"] {
-        left: 12px !important;
+        left: 16px !important;
         bottom: 32px !important;
     }
 }
 
-/* Hover style: elegant teal border glow, scale, and background change */
+/* Enhanced hover style with animation */
 div[data-testid="stFileUploader"]:hover {
-    background-color: var(--teal-glow) !important;
-    border-color: var(--teal) !important;
-    transform: translateY(-1px) scale(1.08) !important;
-    box-shadow: 0 0 10px rgba(45, 212, 191, 0.25) !important;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--blue) 100%) !important;
+    transform: translateY(-4px) scale(1.15) !important;
+    box-shadow: 0 10px 30px rgba(45, 212, 191, 0.4) !important;
 }
 
 /* Plus sign styling */
 div[data-testid="stFileUploader"]::before {
     content: "+" !important;
-    color: var(--text-muted) !important;
-    font-size: 22px !important;
-    font-weight: 400 !important;
+    color: var(--bg) !important;
+    font-size: 26px !important;
+    font-weight: 600 !important;
     line-height: 1 !important;
     position: absolute !important;
     pointer-events: none !important;
-    margin-top: -2px; /* vertical tuning */
-    transition: color 0.2s ease !important;
+    transition: all 0.3s ease !important;
 }
 
 div[data-testid="stFileUploader"]:hover::before {
-    color: var(--teal) !important; /* glowing teal on hover */
+    color: var(--text) !important;
+    transform: scale(1.2) !important;
 }
 
 /* Hide default file uploader text elements */
@@ -306,150 +382,225 @@ div[data-testid="stFileUploader"] * {
 
 
 /* ════════════════════════════════════
-   TYPOGRAPHY IN CHAT
+   TYPOGRAPHY IN CHAT — Enhanced readability
    ════════════════════════════════════ */
 [data-testid="stChatMessage"] p {
     color: #c2c8d4 !important;
-    line-height: 1.8 !important;
-    font-size: 1rem !important;
+    line-height: 1.9 !important;
+    font-size: 0.95rem !important;
 }
+
 [data-testid="stChatMessage"] h2 {
-    color: var(--text) !important;
-    font-size: 1.1rem !important;
-    font-weight: 600 !important;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-    margin: 18px 0 10px !important;
+    color: var(--teal) !important;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid var(--teal-border);
+    padding-bottom: 8px;
+    margin: 20px 0 12px !important;
+    letter-spacing: -0.01em;
 }
+
 [data-testid="stChatMessage"] h3 {
     color: var(--teal) !important;
-    font-size: 0.92rem !important;
+    font-size: 0.95rem !important;
     font-weight: 600 !important;
-    margin: 14px 0 6px !important;
+    margin: 16px 0 8px !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
 }
-[data-testid="stChatMessage"] strong { color: var(--text) !important; font-size: 1rem !important; }
+
+[data-testid="stChatMessage"] strong { 
+    color: var(--text) !important; 
+    font-size: 1rem !important; 
+    font-weight: 600 !important;
+}
+
 [data-testid="stChatMessage"] code {
     background: var(--surface2) !important;
     color: var(--teal) !important;
-    border-radius: 4px;
-    padding: 1px 5px;
+    border-radius: 5px;
+    padding: 2px 7px;
     font-family: var(--font-mono) !important;
-    font-size: 0.9em;
+    font-size: 0.88em;
     border: 1px solid var(--border);
 }
-[data-testid="stChatMessage"] ul { padding-left: 18px !important; }
-[data-testid="stChatMessage"] ul li { color: #8d97a5 !important; margin-bottom: 4px !important; font-size: 0.97rem !important; }
+
+[data-testid="stChatMessage"] ul { 
+    padding-left: 20px !important;
+    margin: 10px 0 !important;
+}
+
+[data-testid="stChatMessage"] ul li { 
+    color: #a4acb8 !important; 
+    margin-bottom: 6px !important; 
+    font-size: 0.95rem !important;
+    line-height: 1.6;
+}
 
 [data-testid="stChatMessage"] table {
     width: 100%;
     border-collapse: collapse;
-    margin: 12px 0 18px;
-    font-size: 0.95rem;
+    margin: 16px 0 20px;
+    font-size: 0.92rem;
 }
+
 [data-testid="stChatMessage"] table th {
     background: var(--surface2) !important;
     color: var(--teal) !important;
     font-size: 0.8rem !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
-    padding: 9px 14px !important;
+    letter-spacing: 0.08em;
+    padding: 11px 15px !important;
     border: 1px solid var(--border) !important;
     text-align: left;
 }
+
 [data-testid="stChatMessage"] table td {
-    padding: 8px 14px !important;
+    padding: 10px 15px !important;
     border: 1px solid var(--border) !important;
     color: #c2c8d4 !important;
-    font-size: 0.93rem !important;
+    font-size: 0.92rem !important;
     vertical-align: top;
-    line-height: 1.55;
+    line-height: 1.6;
 }
+
 [data-testid="stChatMessage"] table tr:nth-child(even) td {
-    background: rgba(255,255,255,0.02) !important;
+    background: rgba(255,255,255,0.025) !important;
 }
+
 [data-testid="stChatMessage"] table tr:hover td {
     background: var(--teal-glow) !important;
 }
 
 /* ════════════════════════════════════
-   HERO
+   HERO — Modern & Striking
    ════════════════════════════════════ */
 .hero {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--teal);
-    border-radius: 10px;
-    padding: 24px 28px;
-    margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--surface2) 0%, var(--surface) 100%);
+    border: 1.5px solid var(--border2);
+    border-left: 4px solid var(--teal);
+    border-radius: 14px;
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(45, 212, 191, 0.08) !important;
+    transition: all 0.3s ease;
 }
+
+.hero:hover {
+    border-left-color: var(--blue);
+    box-shadow: 0 12px 32px rgba(45, 212, 191, 0.12) !important;
+}
+
 .hero-eyebrow {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--teal-dim);
-    margin-bottom: 8px;
+    color: var(--teal);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
+
+.hero-eyebrow::before {
+    content: '✨';
+}
+
 .hero h1 {
-    font-size: 1.55rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: var(--text);
-    margin: 0 0 7px 0;
-    letter-spacing: -0.025em;
-    line-height: 1.25;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.03em;
+    line-height: 1.3;
 }
-.hero h1 span { color: var(--teal); }
+
+.hero h1 span { 
+    color: var(--teal);
+    background: linear-gradient(135deg, var(--teal) 0%, var(--blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
 .hero p {
     color: var(--text-muted);
-    font-size: 0.88rem;
-    margin: 0 0 16px 0;
-    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 0 0 18px 0;
+    line-height: 1.7;
 }
-.hero-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.hero-pills { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 8px; 
+}
+
 .pill {
-    background: var(--surface2);
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 3px 10px;
-    font-size: 0.72rem;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
     color: var(--text-muted);
     font-weight: 500;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.pill:hover {
+    background: var(--teal-glow);
+    border-color: var(--teal);
+    color: var(--teal);
 }
 
 /* ════════════════════════════════════
-   METRIC CARDS
+   METRIC CARDS — Premium Layout
    ════════════════════════════════════ */
 .metric-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 8px;
-    margin: 14px 0 6px;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin: 18px 0 12px;
 }
+
 .metric-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 11px 13px;
+    background: linear-gradient(135deg, var(--surface2) 0%, rgba(45, 212, 191, 0.05) 100%);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: all 0.2s ease;
+    cursor: default;
 }
+
+.metric-card:hover {
+    border-color: var(--teal);
+    background: linear-gradient(135deg, var(--surface2) 0%, rgba(45, 212, 191, 0.1) 100%);
+    box-shadow: 0 4px 12px rgba(45, 212, 191, 0.12);
+    transform: translateY(-2px);
+}
+
 .metric-card .mc-label {
     font-size: 10px;
     color: var(--text-dim);
     text-transform: uppercase;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.1em;
     font-weight: 600;
 }
+
 .metric-card .mc-value {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text);
-    margin-top: 5px;
+    margin-top: 7px;
     font-family: var(--font-mono);
     letter-spacing: -0.01em;
 }
+
 .mc-value.up   { color: var(--green) !important; }
 .mc-value.down { color: var(--red)   !important; }
 .mc-value.teal { color: var(--teal)  !important; }
@@ -460,27 +611,87 @@ div[data-testid="stFileUploader"] * {
 .badge {
     display: inline-block;
     background: var(--teal-glow);
-    border: 1px solid var(--teal-border);
-    border-radius: 4px;
-    padding: 2px 8px;
+    border: 1.5px solid var(--teal-border);
+    border-radius: 6px;
+    padding: 4px 10px;
     font-size: 10px;
-    color: var(--teal-dim);
+    color: var(--teal);
     font-weight: 700;
     letter-spacing: 0.09em;
     text-transform: uppercase;
     margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.badge:hover {
+    border-color: var(--teal);
+    background: rgba(45, 212, 191, 0.15);
 }
 
 /* ════════════════════════════════════
-   MISC
+   MISC — Polished Details
    ════════════════════════════════════ */
-hr { border-color: var(--border) !important; margin: 12px 0 !important; }
-.stSpinner > div { border-top-color: var(--teal) !important; }
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: var(--teal-deep); }
-#MainMenu, footer, header { visibility: hidden; }
+hr { 
+    border-color: var(--border) !important; 
+    margin: 14px 0 !important; 
+}
+
+.stSpinner > div { 
+    border-top-color: var(--teal) !important; 
+}
+
+/* Loading animations */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+/* Scroll styling */
+::-webkit-scrollbar { 
+    width: 6px; 
+    height: 6px;
+}
+
+::-webkit-scrollbar-track { 
+    background: transparent; 
+}
+
+::-webkit-scrollbar-thumb { 
+    background: var(--border2); 
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover { 
+    background: var(--teal); 
+}
+
+#MainMenu, footer, header { 
+    visibility: hidden; 
+}
+
+/* Error message styling */
+.stAlert {
+    border-radius: 10px !important;
+    border-left: 4px solid var(--red) !important;
+}
+
+/* Success message styling */
+.stSuccess {
+    border-radius: 10px !important;
+    border-left: 4px solid var(--green) !important;
+}
+
+/* Info message styling */
+.stInfo {
+    border-radius: 10px !important;
+    border-left: 4px solid var(--teal) !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -648,12 +859,12 @@ def create_candlestick_chart(symbol: str, period: str = "6mo"):
 
 
 # ─────────────────────────────────────────────────────────────
-# SIDEBAR  — clean, uniform
+# SIDEBAR  — Modern & Organized
 # ─────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
-    <div style="padding:18px 12px 12px;">
-        <div style="display:flex;align-items:center;gap:9px;">
+    <div style="padding:20px 12px 16px;">
+        <div style="display:flex;align-items:center;gap:10px;">
             <span class="sb-icon">📈</span>
             <div>
                 <div class="sb-brand-name">FinSight <span style="color:#2dd4bf;">AI</span></div>
@@ -665,9 +876,10 @@ with st.sidebar:
 
     st.divider()
 
-    st.markdown('<span class="sb-section-label">Recent Searches</span>', unsafe_allow_html=True)
+    # Recent Searches Section
+    st.markdown('<div class="sb-section-label"><span class="sb-section-icon">🕐</span>Recent Searches</div>', unsafe_allow_html=True)
     if not st.session_state.search_history:
-        st.markdown('<p class="sb-tip" style="padding:2px 0;">No searches yet.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="sb-tip" style="padding:4px 0;opacity:0.7;">No searches yet. Start typing!</p>', unsafe_allow_html=True)
     else:
         for sym in st.session_state.search_history:
             if st.button(sym, key=f"hist_{sym}", use_container_width=True):
@@ -676,7 +888,8 @@ with st.sidebar:
 
     st.divider()
 
-    st.markdown('<span class="sb-section-label">Quick Look</span>', unsafe_allow_html=True)
+    # Quick Look Section
+    st.markdown('<div class="sb-section-label"><span class="sb-section-icon">⭐</span>Quick Look</div>', unsafe_allow_html=True)
     for q in ["TCS", "Reliance", "HDFC Bank", "Infosys", "Wipro", "SBI"]:
         if st.button(q, key=f"quick_{q}", use_container_width=True):
             st.session_state.trigger_search = q
@@ -684,37 +897,41 @@ with st.sidebar:
 
     st.divider()
 
+    # Help & Info Section
     st.markdown("""
-    <div class="sb-tip">
-        <b style="color:#7a8694;">How to use</b><br>
-        → <code>TCS</code> or <code>TCS.NS</code><br>
-        → Tell me about Reliance<br>
-        → What is a P/E ratio?<br>
-        → Compare TCS and Infosys
-    </div>
-    <div style="margin-top:14px;padding:9px 10px;background:#131720;border:1px solid #232b38;border-radius:7px;">
-        <div style="font-size:10px;color:#3e4a58;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:3px;">Disclaimer</div>
-        <div style="font-size:11px;color:#3e4a58;">AI-generated. Not financial advice.</div>
+    <div style="padding:0 2px;">
+        <div class="sb-section-label"><span class="sb-section-icon">❓</span>How to Use</div>
+        <div class="sb-tip" style="margin-bottom:12px;">
+            <b style="color:#a4acb8;">Examples:</b><br>
+            • <code>TCS</code> or <code>TCS.NS</code><br>
+            • Tell me about Reliance<br>
+            • What is a P/E ratio?<br>
+            • Compare TCS and Infosys
+        </div>
+        <div style="padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;">
+            <div style="font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;font-weight:600;">⚠️ Disclaimer</div>
+            <div style="font-size:11px;color:var(--text-dim);line-height:1.6;">AI-generated insights. Not financial advice. Verify with professionals.</div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────
-# HERO BANNER
+# HERO BANNER — Enhanced Design
 # ─────────────────────────────────────────────────────────────
 if not st.session_state.rag_store:
     st.markdown("""
     <div class="hero">
-        <div class="hero-eyebrow">NSE &nbsp;·&nbsp; BSE &nbsp;·&nbsp; AI-Powered Research</div>
+        <div class="hero-eyebrow">NSE &nbsp;·&nbsp; BSE &nbsp;·&nbsp; AI-POWERED RESEARCH</div>
         <h1>Indian Equity <span>Intelligence</span>, Reimagined</h1>
-        <p>Ask for any stock by name — no tickers required. Get structured reports, live charts, key ratios, and AI-driven insights.</p>
+        <p>Ask for any stock by name — no tickers required. Get structured reports, live charts, key ratios, and AI-driven insights powered by Gemini LLM.</p>
         <div class="hero-pills">
-            <span class="pill">Structured Reports</span>
-            <span class="pill">Live Charts + SMA</span>
-            <span class="pill">Key Ratios Table</span>
-            <span class="pill">Latest News</span>
-            <span class="pill">Analyst Targets</span>
-            <span class="pill">AI Synthesis</span>
+            <span class="pill">📊 Structured Reports</span>
+            <span class="pill">📈 Live Charts + SMA</span>
+            <span class="pill">📋 Key Ratios</span>
+            <span class="pill">📰 News Digest</span>
+            <span class="pill">🎯 Analyst Targets</span>
+            <span class="pill">✨ AI Synthesis</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -722,15 +939,15 @@ else:
     st.markdown("""
     <div class="hero">
         <div class="hero-eyebrow">DOCUMENT RAG &nbsp;·&nbsp; NATIVE EMBEDDINGS &nbsp;·&nbsp; AI ANALYSIS</div>
-        <h1>Financial <span>Document</span> RAG Analyser</h1>
-        <p>FinSight AI has chunked and indexed your attached file using Google Gemini embeddings. Ask questions directly in the chat input below.</p>
+        <h1>Financial <span>Document</span> Analyst</h1>
+        <p>FinSight AI has processed and indexed your document using Google Gemini embeddings. Ask any question about your document below and get instant AI-powered answers.</p>
         <div class="hero-pills">
-            <span class="pill">PDF & TXT Parsing</span>
-            <span class="pill">Smart Overlapping Chunks</span>
-            <span class="pill">Gemini Embedding Models</span>
-            <span class="pill">Cosine Similarity Index</span>
-            <span class="pill">Context-Augmented Generation</span>
-            <span class="pill">Zero Framework Overhead</span>
+            <span class="pill">📄 PDF & TXT Parsing</span>
+            <span class="pill">🔗 Smart Chunks</span>
+            <span class="pill">🧠 Gemini Embeddings</span>
+            <span class="pill">🔍 Similarity Search</span>
+            <span class="pill">💬 Context-Aware Q&A</span>
+            <span class="pill">⚡ Zero Framework Overhead</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -755,16 +972,18 @@ st.markdown('<div style="margin-top: 15px;"></div>', unsafe_allow_html=True)
 
 # Visual status bar if a document is loaded
 if st.session_state.rag_store:
-    col_status, col_clear = st.columns([8.2, 1.8], gap="small")
+    col_status, col_clear = st.columns([8.5, 1.5], gap="small")
     with col_status:
         st.markdown(f"""
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; background: var(--teal-glow); border: 1px solid var(--teal-border); border-radius: 20px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size:14px;">📎</span>
-                <span style="font-size: 13px; color: var(--text); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;">{st.session_state.rag_filename}</span>
-                <span style="font-size: 10px; color: var(--teal); background: rgba(45,212,191,0.15); padding: 2px 7px; border-radius: 12px; font-family: var(--font-mono);">{st.session_state.rag_chunks} chunks</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; background: linear-gradient(135deg, var(--teal-glow) 0%, rgba(45,212,191,0.08) 100%); border: 1.5px solid var(--teal-border); border-radius: 24px; box-shadow: 0 4px 12px rgba(45,212,191,0.1);">
+            <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                <span style="font-size:16px;animation:pulse 2s infinite;">📎</span>
+                <div>
+                    <span style="font-size: 13px; color: var(--text); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 350px; display: block;">{st.session_state.rag_filename}</span>
+                    <span style="font-size: 11px; color: var(--text-muted);">{st.session_state.rag_chunks} chunks indexed</span>
+                </div>
             </div>
-            <span style="font-size: 10px; color: var(--teal); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding-right: 5px;">RAG Enabled</span>
+            <span style="font-size: 10px; color: var(--teal); background: rgba(45,212,191,0.2); padding: 4px 10px; border-radius: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; margin-left: 10px;">RAG Enabled</span>
         </div>
         """, unsafe_allow_html=True)
     with col_clear:
@@ -802,7 +1021,7 @@ if uploaded_file is not None:
             st.error(f"Error: {e}")
 
 
-input_placeholder = f"Ask about {st.session_state.rag_filename}…" if st.session_state.rag_store else "Ask about a stock or market trend…"
+input_placeholder = f"💡 Ask about {st.session_state.rag_filename}…" if st.session_state.rag_store else "💬 Ask about a stock, trend, or financial concept…"
 prompt = st.chat_input(input_placeholder)
 
 if st.session_state.trigger_search:
