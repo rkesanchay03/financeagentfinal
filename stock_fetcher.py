@@ -259,7 +259,8 @@ def fetch_detailed_stock_data(symbol: str):
 
     except Exception as e:
         print(f"An error occurred while fetching data for {symbol}: {e}")
-        return {"error": f"Could not retrieve data for symbol '{symbol}'. Please try a valid NSE ticker (e.g., TCS.NS, RELIANCE.NS)."}
+        # Raise the exception so Streamlit DOES NOT cache the error!
+        raise ValueError(f"Could not retrieve data for symbol '{symbol}'.")
 
 
 @st.cache_data(ttl=600, show_spinner=False)

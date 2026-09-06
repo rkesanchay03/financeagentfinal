@@ -61,81 +61,103 @@ def _call_gemini_api(prompt, system_message):
 # ─────────────────────────────────────────────────────────────
 # SMART INTENT CLASSIFIER
 # ─────────────────────────────────────────────────────────────
-_STOCK_TRIGGER_PHRASES = [
-    "stock", "share", "price", "report", "analyze", "analysis",
-    "tell me about", "what is", "show me", "give me", "nse", "bse",
-    "equity", "market cap", "pe ratio", "dividend", "earnings"
-]
+from rag_processor import get_embeddings_batch, cosine_similarity
 
-def _looks_like_stock_query(text: str) -> bool:
+class SemanticRouter:
     """
-    Heuristic check: does the text appear to be asking about a specific stock?
-    Covers:
-      - Explicit ticker suffixes:   TCS.NS, RELIANCE.BSE
-      - Pure short-code:            TCS, INFY, WIPRO
-      - Natural language:           "tell me about TCS", "TCS stock price"
+    A fast, API-based Semantic Router that uses embeddings to classify intent.
+    It embeds example phrases once and caches them. When a user asks a question,
+    it embeds the question and uses Cosine Similarity to find the closest intent cluster.
+    This avoids the slow LLM text generation API call!
     """
-    t = text.strip().upper()
+    _instance = None
 
-    # Has exchange suffix → definitely a stock
-    if t.endswith(".NS") or t.endswith(".BSE") or t.endswith(".BO"):
-        return True
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(SemanticRouter, cls).__new__(cls)
+            cls._instance._initialize()
+        return cls._instance
 
-    # Check curated map
-    from stock_fetcher import _INDIAN_SYMBOL_MAP
-    cleaned = t
-    for word in ["STOCK", "SHARE", "SHARES", "PRICE", "ABOUT", "TELL ME ABOUT",
-                 "WHAT IS", "ANALYZE", "ANALYSIS", "REPORT", "ON"]:
-        cleaned = cleaned.replace(word, "").strip()
-    if cleaned in _INDIAN_SYMBOL_MAP or cleaned.replace(" ", "") in _INDIAN_SYMBOL_MAP:
-        return True
+    def _initialize(self):
+        # 1. Define example queries for each intent
+        self.examples = {
+            "new_report": [
+                "TCS price", "give me a report on reliance", "how is hdfc doing", 
+                "tata motors stock", "what is the market cap of infosys", "TCS.NS",
+                "show me sbi", "analyze wipro", "I want to see adani", "nifty 50",
+                "stock price of hcl", "how is itc performing"
+            ],
+            "follow_up": [
+                "what about its debt?", "does it pay a dividend?", "who is the ceo?", 
+                "how does that compare to the industry?", "what is the pe ratio of this company?",
+                "is it a buy?", "tell me more about their revenue", "what are the risks?"
+            ],
+            "general_query": [
+                "what is a pe ratio?", "explain mutual funds", "how do interest rates affect stocks", 
+                "what is an etf", "how to invest in index funds", "what does market cap mean",
+                "explain the stock market", "what is inflation", "how do I save money"
+            ]
+        }
+        
+        self.flat_examples = []
+        self.flat_intents = []
+        for intent, phrases in self.examples.items():
+            for phrase in phrases:
+                self.flat_examples.append(phrase)
+                self.flat_intents.append(intent)
+        
+        self.embeddings = []
 
-    # Contains a trigger phrase alongside a short capitalised word (possible ticker)
-    lower = text.lower()
-    for phrase in _STOCK_TRIGGER_PHRASES:
-        if phrase in lower:
-            words = text.strip().split()
-            for w in words:
-                w_clean = w.strip(".,?!").upper()
-                if (2 <= len(w_clean) <= 12 and w_clean.isalpha()
-                        and w_clean not in {"THE", "A", "AN", "IS", "IN", "OF",
-                                            "FOR", "ME", "MY", "AT", "ON", "BY",
-                                            "ITS", "NSE", "BSE", "STOCK", "SHARE",
-                                            "TELL", "SHOW", "GIVE", "WHAT", "ABOUT"}):
-                    return True
-    return False
+    def route(self, query: str, stock_context) -> str:
+        # Fast local checks for explicit tickers to save even the embedding call
+        t = query.strip().upper()
+        if t.endswith(".NS") or t.endswith(".BSE") or t.endswith(".BO"):
+            return "new_report"
+            
+        # Cache embeddings for the examples on the very first run
+        if not self.embeddings:
+            print("Initializing Semantic Router Embeddings...")
+            self.embeddings = get_embeddings_batch(self.flat_examples)
+            
+        # Embed the user's query
+        try:
+            query_emb = get_embeddings_batch([query])[0]
+        except Exception:
+            # Fallback if API fails
+            return "general_query"
+        
+        best_intent = "general_query"
+        best_score = -1
+        
+        # Compare the query against all examples using cosine similarity
+        for intent, emb in zip(self.flat_intents, self.embeddings):
+            # If the user asks a follow-up but hasn't searched a stock yet, ignore follow_up matches
+            if intent == "follow_up" and not stock_context:
+                continue
+                
+            score = cosine_similarity(query_emb, emb)
+            if score > best_score:
+                best_score = score
+                best_intent = intent
+                
+        print(f"Semantic Router classified '{query}' as '{best_intent}' (Confidence: {best_score:.2f})")
+        
+        # If the highest match is very low confidence, default to general_query
+        if best_score < 0.4:
+            return "general_query"
+            
+        return best_intent
 
+
+# Instantiate the singleton router
+_semantic_router = SemanticRouter()
 
 def classify_intent(question: str, stock_context) -> str:
     """
     Classifies intent into: new_report | follow_up | general_query
-    Uses a fast heuristic first; falls back to LLM if ambiguous.
+    Uses the fast Semantic Router instead of slow LLM generation.
     """
-    # Fast heuristic path (avoids an extra LLM call)
-    if _looks_like_stock_query(question):
-        return "new_report"
-
-    context_exists = "Yes" if stock_context else "No"
-
-    system_message = (
-        "You are an expert at classifying user intent in a financial chatbot. "
-        "Respond with ONLY ONE of these three words (no punctuation, no explanation):\n"
-        "new_report — user is asking for a stock report on a company or ticker\n"
-        "follow_up  — user is asking a question about the stock already discussed\n"
-        "general_query — any other finance question or concept"
-    )
-    prompt = (
-        f"Stock context currently loaded: {context_exists}\n"
-        f'User message: "{question}"\n\n'
-        "Classification:"
-    )
-
-    raw = _call_gemini_api(prompt, system_message).strip().lower()
-    # Normalise — handle extra words / newlines in the response
-    for label in ["new_report", "follow_up", "general_query"]:
-        if label in raw:
-            return label
-    return "general_query"
+    return _semantic_router.route(question, stock_context)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -191,7 +213,11 @@ def generate_report(user_input: str):
     symbol = resolve_symbol(user_input)
     print(f"Resolved '{user_input}' → '{symbol}'")
 
-    data = fetch_detailed_stock_data(symbol)
+    try:
+        data = fetch_detailed_stock_data(symbol)
+    except ValueError as e:
+        return f"Could not retrieve data for symbol '{symbol}'. Please try a valid NSE ticker (e.g., TCS.NS, RELIANCE.NS).", None
+
     if data.get("error"):
         return data["error"], None
 
