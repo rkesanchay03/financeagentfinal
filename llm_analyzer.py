@@ -111,7 +111,8 @@ class SemanticRouter:
             "general_query": [
                 "what is a pe ratio?", "explain mutual funds", "how do interest rates affect stocks", 
                 "what is an etf", "how to invest in index funds", "what does market cap mean",
-                "explain the stock market", "what is inflation", "how do I save money"
+                "explain the stock market", "what is inflation", "how do I save money",
+                "hello", "hi", "hey", "hii", "how are you", "good morning", "what can you do"
             ]
         }
         
@@ -159,7 +160,7 @@ class SemanticRouter:
         print(f"Semantic Router classified '{query}' as '{best_intent}' (Confidence: {best_score:.2f})")
         
         # If the highest match is very low confidence, default to general_query
-        if best_score < 0.4:
+        if best_score < 0.55:
             return "general_query"
             
         return best_intent
