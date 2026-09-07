@@ -43,6 +43,22 @@ def _call_gemini_api(prompt, system_message):
         return "Error: Could not extract response text from Gemini API."
 
     except requests.exceptions.HTTPError as he:
+        # Check if it's a 503 (Overloaded) or 429 (Rate Limit)
+        if response.status_code in [503, 429] and model != "gemini-1.5-flash":
+            print(f"Model {model} is overloaded. Falling back to gemini-1.5-flash...")
+            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+            try:
+                fb_response = requests.post(fallback_url, headers={"Content-Type": "application/json"}, json=payload)
+                fb_response.raise_for_status()
+                fb_resp_json = fb_response.json()
+                fb_candidates = fb_resp_json.get("candidates", [])
+                if fb_candidates:
+                    fb_parts = fb_candidates[0].get("content", {}).get("parts", [])
+                    if fb_parts:
+                        return fb_parts[0].get("text", "")
+            except Exception as fallback_e:
+                return f"⚠️ **Gemini API Error**: Both primary and fallback models are currently unavailable. Please try again later."
+                
         error_details = ""
         try:
             err_msg = response.json().get("error", {}).get("message", "No message")
