@@ -203,7 +203,7 @@ def answer_rag_question(question: str, document_name: str, retrieved_context: li
     prompt = f"""
 You are a highly analytical AI finance assistant. You have been provided with relevant retrieved extracts from the uploaded document: **{document_name}**.
 
-Use the retrieved extracts below to answer the user's question accurately. If the answer cannot be found or inferred from the provided context, state clearly that the document does not contain that information, but answer to the best of your ability if general knowledge allows.
+Use ONLY the retrieved extracts below to answer the user's question. If the answer cannot be found in the provided context, respond with: "The document does not contain enough information to answer this question." Do NOT use outside knowledge or speculate.
 
 **Retrieved Extracts from {document_name}:**
 {context_str}
@@ -214,7 +214,7 @@ Provide a structured, detailed, and professional answer. Highlight key numbers, 
 """
     return _call_gemini_api(
         prompt,
-        f"You are a professional financial analyst AI answering questions based on the uploaded document: {document_name}."
+        f"You are a strict financial document analyst. Answer ONLY from the provided document extracts from: {document_name}. Never speculate or use outside knowledge."
     )
 
 

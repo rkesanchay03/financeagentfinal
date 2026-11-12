@@ -1,6 +1,6 @@
 import time
 import random
-from llm_analyzer import _looks_like_stock_query
+from llm_analyzer import classify_intent, SemanticRouter
 from rag_processor import chunk_text, cosine_similarity
 
 def test_router():
