@@ -89,7 +89,7 @@ Traditional AI agents fail in finance because general LLMs hallucinate financial
 - **Native Vector Store:** Implemented in pure Python without external vector database dependencies (Pinecone/Milvus/ChromaDB).
 - **Exact Dot-Product Cosine Similarity:**
   $$\text{Cosine Similarity}(u, v) = \frac{\sum_{i=1}^{d} u_i v_i}{\sqrt{\sum_{i=1}^{d} u_i^2} \cdot \sqrt{\sum_{i=1}^{d} v_i^2}}$$
-- **Top-$K$ Grounded Retrieval ($k=3$):** Retrieves the 3 highest-ranking chunks and injects them into a constrained system prompt with a strict negative constraint (*"If the answer cannot be found in the extracts, respond that the document lacks sufficient information"*).
+- **Top-K Grounded Retrieval ($k=3$):** Retrieves the 3 highest-ranking chunks and injects them into a constrained system prompt with a strict negative constraint (*"If the answer cannot be found in the extracts, respond that the document lacks sufficient information"*).
 
 ### 4. Enterprise Fault Tolerance & Resilience
 - **Automated Model Circuit-Breaking:** The centralized Gemini API client automatically catches HTTP `503 Service Unavailable` (demand spikes) and HTTP `429 Too Many Requests` (quota rate limits), seamlessly redirecting payloads to a fallback model (`gemini-1.5-flash`).
